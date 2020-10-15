@@ -15,7 +15,7 @@ void LinkedList::add_to_front(std::string name) {
 
 void LinkedList::add_to_back(std::string name){
 	std::unique_ptr<Node> ptr = std::make_unique<Node>();
-	ptr->name = "parameter";
+	ptr->name = name;
 	ptr->next = nullptr;
 
 	if(head != nullptr) {
@@ -24,7 +24,6 @@ void LinkedList::add_to_back(std::string name){
 		while(curr->next != nullptr) {
 			curr = curr->next.get();
 		}
-
 		curr->next = std::move(head);
 	} else {
 		head = std::move(ptr);
@@ -45,7 +44,6 @@ void LinkedList::add_at_index(std::string name, int index) {
 
 		ptr->next = std::move(curr->next);
 	} else {
-		ptr->name = name;
 		ptr->next = std::move(head);
 		head = std::move(ptr);
 	}
@@ -62,10 +60,10 @@ void LinkedList::remove_from_front() {
 void LinkedList::remove_from_back() {
 	if (head != nullptr) {
 		if (head->next != nullptr) {
-			std::unique_ptr<Node> curr = std::move(head);
+			Node* curr = head.get();
 
-			while(curr->next != nullptr) {
-				curr = std::move(curr->next);
+			while(curr->next->next != nullptr) {
+				curr = curr->next.get();
 			}
 
 			curr->next = nullptr;
@@ -82,8 +80,9 @@ void LinkedList::remove_at_index(int index) {
 			Node* curr = head.get();
 
 			for(int i = 0; i < index-1; i++) {
-				curr->next = std::move(curr->next);
+				curr = curr->next.get();
 			}
+			curr->next = std::move(curr->next->next);
 		} else {
 			head = std::move(head->next);
 		}
@@ -94,8 +93,8 @@ void LinkedList::remove_at_index(int index) {
 void LinkedList::print_names() {
 	Node* ptr = head.get();
 
-	while(ptr->next != nullptr) {
-		std::cout << ptr->name << "\t" << std::endl;
+	while(ptr != nullptr) {
+		std::cout << ptr->name << "\t";
 		ptr = ptr->next.get();
 	}
 
